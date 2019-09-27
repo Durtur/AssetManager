@@ -68,7 +68,11 @@ var loggedAsAdmin;
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1200, height: 800, fullscreen: false, frame: false })
+  mainWindow = new BrowserWindow({
+    width: 1200, height: 800, fullscreen: false, frame: false, webPreferences: {
+      nodeIntegration: true,
+    },
+  })
 
 
   if (process.platform === 'darwin') {
@@ -122,7 +126,7 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
-    if(updatePending)
+    if (updatePending)
       autoUpdater.quitAndInstall();
   })
 }
@@ -148,7 +152,10 @@ ipcMain.on('open-users-window', function (event, adminAccess) {
   usersWindow = new BrowserWindow({
     height: 600,
     resizable: true,
-    width: 1200
+    width: 1200,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   usersWindow.loadFile('users.html');
