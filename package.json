@@ -5,15 +5,28 @@
   "main": "main.js",
   "scripts": {
     "start": "npm install && electron .",
-    "postinstall": "install-app-deps"
+    "postinstall": "install-app-deps",
+    "build": "electron-builder build --win --publish never",
+    "deploy": "electron-builder build  --win --publish always"
   },
+  "build": {
+    "appId": "is.simonorn.assetmanagerlite",
+   
+    "win": {
+      "target": "nsis",
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    
   "keywords": [
     "Asset management",
     "lightweight",
     "electron"
   ],
   "author": "Símon Örn Reynisson",
-  "license": "CC0-1.0",
+  "license": "CC BY-NC-ND",
   "devDependencies": {
     "electron": "^4.0.3",
     "electron-builder": "^20.38.5",
@@ -28,7 +41,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Durtur/AssetManager.git"
-  },
-  "build": "electron-builder build --win --publish never",
-  "deploy": "electron-builder build  --win --publish always"
+  }
+
 }
