@@ -15,11 +15,14 @@ function openUsersWindow() {
 
 ipcRenderer.on('update_available', () => {
     ipcRenderer.removeAllListeners('update_available');
-    showNotification("Update available!")
+    showNotification("Update available!");
+    logger.log("Update available");
   });
   ipcRenderer.on('update_downloaded', () => {
     ipcRenderer.removeAllListeners('update_downloaded');
-    showNotification("Update will be installed after the app closes.")
+    showNotification("Update will be installed after the app closes.");
+    logger.log("Update downloaded");
+    dialog.showMessageBox("An update has been downloaded, the app will now restart.");
   });
 function firebaseLoadCompleted(){
     subscribeToUserList(function (value) {

@@ -35,7 +35,6 @@ function initialize() {
     } 
 
     data = JSON.parse(data);
-    console.log(data)
     config = data;
     // Initialize Firebase
     firebase.initializeApp(data.firebaseConfig);
