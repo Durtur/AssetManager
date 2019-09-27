@@ -1,5 +1,4 @@
-
-
+const { ipcRenderer } = require('electron');
 const ipc = electron.ipcRenderer;
 var adminAccess = false;
 var currentUserName, currentUserInfo;

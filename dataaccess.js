@@ -8,7 +8,7 @@ const electron = require("electron");
 const {shell} = require('electron');
 
 const { dialog } = require('electron').remote
-const resourcePath = pathModule.join(app.getPath("userData"), 'data');
+const resourcePath = pathModule.join(app.getPath("userData"));
 /*
 By default it writes logs to the following locations:
 
