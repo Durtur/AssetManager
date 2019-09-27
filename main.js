@@ -3,11 +3,13 @@ const { app, Menu, BrowserWindow } = require('electron')
 const { ipcMain } = require('electron')
 const { autoUpdater } = require('electron-updater');
 
+var updatePending = false;
 autoUpdater.on('update-available', () => {
   mainWindow.webContents.send('update_available');
 });
 autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('update_downloaded');
+  updatePending = true;
 });
 
 const template = [
@@ -120,6 +122,8 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
+    if(updatePending)
+      autoUpdater.quitAndInstall();
   })
 }
 

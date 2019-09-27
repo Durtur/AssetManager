@@ -9,17 +9,6 @@
     "build": "electron-builder build --win --publish never",
     "deploy": "electron-builder build  --win --publish always"
   },
-  "build": {
-    "appId": "is.simonorn.assetmanagerlite",
-   
-    "win": {
-      "target": "nsis",
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    
   "keywords": [
     "Asset management",
     "lightweight",
@@ -29,8 +18,7 @@
   "license": "CC BY-NC-ND",
   "devDependencies": {
     "electron": "^4.0.3",
-    "electron-builder": "^20.38.5",
-    "electron-rebuild": "^1.8.2"
+    "electron-builder": "^20.38.5"
   },
   "dependencies": {
     "electron-log": "^3.0.8",
@@ -42,5 +30,4 @@
     "type": "git",
     "url": "https://github.com/Durtur/AssetManager.git"
   }
-
 }
