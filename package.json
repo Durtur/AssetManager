@@ -1,0 +1,34 @@
+{
+  "name": "AssetManagerLite",
+  "version": "1.0.0",
+  "description": "A minimal asset management application",
+  "main": "main.js",
+  "scripts": {
+    "start": "npm install && electron .",
+    "postinstall": "install-app-deps"
+  },
+  "keywords": [
+    "Asset management",
+    "lightweight",
+    "electron"
+  ],
+  "author": "Símon Örn Reynisson",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^4.0.3",
+    "electron-builder": "^20.38.5",
+    "electron-rebuild": "^1.8.2"
+  },
+  "dependencies": {
+    "electron-log": "^3.0.8",
+    "electron-updater": "^4.1.2",
+    "firebase": "^5.8.2",
+    "nfc-pcsc": "^0.7.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Durtur/AssetManager.git"
+  },
+  "build": "electron-builder build --win --publish never",
+  "deploy": "electron-builder build  --win --publish always"
+}

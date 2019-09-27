@@ -1,0 +1,5 @@
+node_modules
+electron-builder.yml
+config.json
+dist
+release-builds

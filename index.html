@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="author" content="">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="awesomplete/awesomplete.css" />
+</head>
+
+<body class="background no_scroll">
+  <section class="login_section" id="login_wrapper">
+      <p class ="online_status_text login_online_status">No internet</p>
+   
+    <div class="column center">
+        <div class = "logo center"></div>
+      <div class="row center_content">
+        <button class="button_clear" id="show_user_and_pass_button" onclick="showUserAndPasswordFields()">User and
+          password</button>
+        <button class="button_clear  button_clear_toggled" id="show_nfc_card_button" onclick=showNfcCardField()>NFC
+          card</button>
+      </div>
+      <div class="column hidden">
+        <label for="login_username" class="text_center ">Username</label>
+        <input type="text" id="login_username">
+      </div>
+      <div class="column">
+        <label for="login_password" class="text_center">Card code</label>
+        <input type="password" class="huge" id="login_password">
+      </div>
+
+      <button class="button_style margin_top " onclick="login()">Login</button>
+      <p class="error_text" id="login_error"></p>
+    </div>
+  </section>
+  <button class = "logout_button " onclick = "logout()" title = "Logout"></button>
+  <p class ="online_status_text app_online_status">No internet</p>
+  <header id = "header">
+    <nav>
+  
+      <a class="header_button  hidden" id="users_tab" onclick="openUsersWindow()">Users</a>
+      <a class="header_button  hidden" id="add_asset_tab" onclick="startAddingAssets()">Add asset</a>
+    </nav>
+
+  </header>
+
+  <section class="nfc_input_container" id="nfc_assign_input">
+      <input type="password" class="huge center_text" id="asset_scan_input" placeholder="Scan">
+      <p class = "error_text" id = "asset_scan_error"></p>
+    </section>
+  <section class="assigned_assetlist_container center column" id="assigned_assetlist_container">
+
+    <section  id="assigned_assetlist">
+      <p id = "username_text" class = "center">User</p>
+      <p id = "no_assets_assigned_text" class = "center">Nothing assigned</p>
+      <div class="asset_list_item_variant table_header">
+        <h4>Name</h4>
+        <p>Type</p>
+        <p>Assign date</p>
+        <div class="button_filler"></div>
+      </div>
+    </section>
+  </section>
+<section class = "wrapper  asset_list_wrapper">
+  <div class = "row center_content">
+    <input class = "searchbox" id = "asset_list_searchbox">
+  </div>
+    <section class="asset_list_section hidden" id="asset_list_section">
+        <div class="asset_list_item table_header">
+          <h4 class = "clickable sortable sortGroup1" onclick = "sortAssetListBy('name', 0)">Name</h4>
+          <p class = "clickable sortable sortGroup1" onclick = "sortAssetListBy('type' , 1)">Type</p>
+          <p class = "clickable sortable sortGroup1" onclick = "sortAssetListBy('assigned_to', 2)">Assignee</p>
+          <p  class = "clickable  sortable sortGroup1" onclick = "sortAssetListBy('assign_date', 3)">Assign date</p>
+          <div class="button_filler"></div>
+        </div>
+    
+      </section>
+</section>
+
+
+  <section class="asset_list_section hidden" id="add_asset_section">
+    <div class="table_header row">
+      <h4>Name</h4>
+      <p>Type</p>
+      <p>Description</p>
+      <p>NFC code</p>
+
+    </div>
+    <div class="add_asset_row">
+      <div class="column">
+        <div class="row">
+          <input type="text" id="asset_name_input">
+          <input type="text" class="awesomplete" id="asset_type_input">
+          <input type="text" id="asset_description_input">
+          <input type="text" class = "asset_nfc_input" id="asset_nfc_input">
+         
+        </div>
+      </div>
+      <div class="row flex_end padded"><button class="button_style green margin_right" onclick="addAsset()">Save</button><button
+          class="button_style" onclick="stopAddingAssets()">Close</button></div>
+    </div>
+    </div>
+
+
+
+  </section>
+<div class = "notification_window">
+  <p>Updated to version ...</p>
+</div>
+
+  <div class="tooltip column hidden" id="asset_row_tooltip">
+    <button class="button_style" onclick="showHistory()">History</button>
+    <button class="button_style" id="edit_asset_button" onclick="editAsset()">Edit</button>
+    <button class="button_style red " id="delete_assets_button" onclick="removeAsset()">Delete</button>
+
+  </div>
+  <script src="nfcInterface.js"></script>
+  <script src="dataaccess.js"></script>
+  <script src="awesomplete/awesomplete.js"></script>
+  <script src="index.js"></script>
+
+</body>
+
+
+</html>
