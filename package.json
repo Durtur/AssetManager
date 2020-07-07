@@ -17,7 +17,7 @@
   "author": "Símon Örn Reynisson",
   "license": "CC BY-NC-ND",
   "devDependencies": {
-    "electron": "^4.0.3",
+    "electron": "^7.2.4",
     "electron-builder": "^20.38.5"
   },
   "dependencies": {
