@@ -1,32 +1,62 @@
+const { electron } = require('electron');
+const dataAccess = require("./dataaccess")
 const { ipcRenderer } = require('electron');
-const ipc = electron.ipcRenderer;
+
+const app = require('electron').remote.app;
+
+dataAccess.initialize(firebaseLoadCompleted);
 var adminAccess = false;
 var currentUserName, currentUserInfo;
 var currentlySelectedAssetElement;
 var loginMode = 0; // 0 = nfc
 var currentlyEditing = false;
 var loggedOn = false;
-var assetList, userList,userCodeList;
+var assetList, userList, userCodeList;
 
 var sortFunctions = { sortDirectionAssetList: [1, 1, -1, 1] };
+// window.setInterval(function () {
+//     dataAccess.authenticate();
+//     console.log("authenticating..")
+// }, 15000);
+
+// window.addEventListener('beforeunload', function (e) {
+    
+//    dataAccess.detach();
+//   });
+window.addEventListener('online', alertOnlineStatus)
+window.addEventListener('offline', alertOnlineStatus)
+alertOnlineStatus();
+
+function alertOnlineStatus() {
+
+    var statusElements = document.getElementsByClassName("online_status_text");
+    for (var i = 0; i < statusElements.length; i++) {
+        navigator.onLine ? statusElements[i].classList.add("hidden") : statusElements[i].classList.remove("hidden");
+    }
+
+}
+
+
 function openUsersWindow() {
-    ipc.send("open-users-window", adminAccess);
+    ipcRenderer.send("open-users-window", adminAccess);
 }
 
 ipcRenderer.on('update_available', () => {
     ipcRenderer.removeAllListeners('update_available');
     showNotification("Update available!");
     logger.log("Update available");
-  });
-  ipcRenderer.on('update_downloaded', () => {
+});
+ipcRenderer.on('update_downloaded', () => {
     ipcRenderer.removeAllListeners('update_downloaded');
     showNotification("Update will be installed after the app closes.");
     logger.log("Update downloaded");
     dialog.showMessageBox("An update has been downloaded, the app will now restart.");
-  });
-function firebaseLoadCompleted(){
-    subscribeToUserList(function (value) {
-        console.log("userlist susbsribed")
+});
+
+
+function firebaseLoadCompleted() {
+    dataAccess.subscribeToUserList(function (value) {
+        console.log("userlist susbscribed")
         userCodeList = [];
         userList = Object.keys(value);
         userInfo = Object.values(value);
@@ -49,30 +79,37 @@ function firebaseLoadCompleted(){
     document.getElementById("asset_description_input").onkeydown = addAssetOnEnter;
 }
 
+function reload() {
+    app.relaunch();
+    app.exit();
+}
 
-function nfcHandler(data){
-    var code = data.uid; 
-    if(!loggedOn){
+function quit() {
+    ipcRenderer.send('app-quit')
+}
+function nfcHandler(data) {
+    var code = data.uid;
+    if (!loggedOn) {
         validateLoginCardCode(code);
-    }else if(!adminAccess){
+    } else if (!adminAccess) {
         processAddOrRemoveAsset(code);
-    }else{
-        if(document.activeElement.classList.contains("asset_nfc_input")){
+    } else {
+        if (document.activeElement.classList.contains("asset_nfc_input")) {
             document.activeElement.value = code;
-        }else{
-            if (userCodeList.indexOf(code)>= 0) return logout();
+        } else {
+            if (userCodeList.indexOf(code) >= 0) return logout();
         }
     }
 }
 
 
-function showNotification(text){
+function showNotification(text) {
     var notificationWindow = document.querySelector(".notification_window");
     notificationWindow.getElementsByTagName("p")[0].innerHTML = text;
     notificationWindow.style.height = "80px";
-    window.setTimeout(function(){
+    window.setTimeout(function () {
         notificationWindow.style.height = "0px";
-    },8000)
+    }, 8000)
 
 
 
@@ -119,16 +156,16 @@ function addOrRemoveAssetOnEnter(event) {
     processAddOrRemoveAsset(scannedValue);
 }
 
-function processAddOrRemoveAsset(scannedValue){
-    
+function processAddOrRemoveAsset(scannedValue) {
+
     var alreadyAssigned = false;
     var errorTextElement = document.getElementById("asset_scan_error");
     errorTextElement.innerHTML = "";
 
-    if (userCodeList.indexOf(scannedValue)>= 0) return logout();
+    if (userCodeList.indexOf(scannedValue) >= 0) return logout();
     if (assetList == null) return;
     for (var i = 0; i < assetList.length; i++) {
-        console.log(assetList[i].nfc_code, scannedValue)
+
         if (assetList[i].nfc_code == scannedValue) {
             if (assetList[i].assigned_to == currentUserName) {
                 alreadyAssigned = true;
@@ -142,7 +179,7 @@ function processAddOrRemoveAsset(scannedValue){
     document.getElementById("asset_scan_input").value = "";
 }
 function initialize() {
-    subscribeToAssetList(loadAssetList);
+    dataAccess.subscribeToAssetList(loadAssetList);
 
     if (adminAccess) {
         document.getElementById("users_tab").classList.remove("hidden");
@@ -150,12 +187,12 @@ function initialize() {
         document.getElementById("asset_list_section").classList.remove("hidden");
         document.getElementById("assigned_assetlist_container").classList.add("hidden");
         document.getElementById("nfc_assign_input").classList.add("hidden");
-        
+
     } else {
         document.getElementById("asset_scan_input").focus();
         document.getElementById("header").classList.add("hidden");
         document.getElementById("asset_list_searchbox").classList.add("hidden");
-        
+
     };
     document.body.classList.remove("no_scroll");
 }
@@ -198,7 +235,7 @@ function logout() {
 
     document.getElementById("header").classList.remove("hidden");
     document.getElementById("asset_list_searchbox").classList.remove("hidden");
-    
+
     document.body.classList.add("no_scroll");
     stopAddingAssets();
 }
@@ -210,7 +247,7 @@ function login() {
     if (loginMode == 1) {
         username = document.getElementById("login_username").value;
         password = document.getElementById("login_password").value;
-        getUserByName(username, function (result, username) {
+        dataAccess.getUserByName(username, function (result, username) {
 
             if (result == null || result.password != password || result.password == null || result.password == "") {
                 document.getElementById("login_password").value = "";
@@ -222,17 +259,17 @@ function login() {
             loginSuccessful(username, result)
         });
     } else {
-       
+
         cardCode = document.getElementById("login_password").value;
         validateLoginCardCode(cardCode);
-       
+
     }
-   
+
 }
 
-function validateLoginCardCode(cardCode){
-    console.log("Login:" + cardCode)
-    getUserByNfcCode(cardCode, function (result, username) {
+function validateLoginCardCode(cardCode) {
+
+    dataAccess.getUserByNfcCode(cardCode, function (result, username) {
         console.log(result)
         if (result == null) {
             document.getElementById("login_password").value = "";
@@ -244,7 +281,7 @@ function validateLoginCardCode(cardCode){
 }
 
 function loginSuccessful(username, userInfo) {
-    console.log(username, userInfo)
+
     currentUserName = username;
     currentUserInfo = userInfo;
     adminAccess = userInfo.isAdmin;
@@ -271,7 +308,7 @@ function loadTypeList() {
     assetList.forEach(function (x) {
         if (listArray.indexOf(x.type.trim()) < 0) listArray.push(x.type.trim())
     })
-    new Awesomplete(document.getElementById("asset_type_input"), { list: listArray, autoFirst: true });
+    new Awesomplete(document.getElementById("asset_type_input"), { list: listArray, autoFirst: true , minChars:0});
 
 
 }
@@ -304,7 +341,7 @@ function addAsset() {
         }
     }
 
-    saveAsset(newAssetName, newAssetType, newAssetNfc, newAssetDescription);
+    dataAccess.saveAsset(newAssetName, newAssetType, newAssetNfc, newAssetDescription);
     currentlyEditing = false;
     clearAddAssetFields();
     document.getElementById("asset_name_input").focus();
@@ -461,38 +498,38 @@ function createDropDownAssignUserList() {
     btn.classList.add("dropbtn", "button_style");
     btn.innerHTML = "Assign"
     btn.addEventListener("click", function (e) {
-        var button =  e.target;
-        var assignInputElement =  button.parentNode.getElementsByClassName("assign_user_dropdown")[0]
+        var button = e.target;
+        var assignInputElement = button.parentNode.getElementsByClassName("assign_user_dropdown")[0]
         hideAllDropdownsAndShowAllButtons();
         assignInputElement.classList.remove("hidden");
-        document.onkeydown =  function(evt){
-            if(evt.keyCode == 27){
+        document.onkeydown = function (evt) {
+            if (evt.keyCode == 27) {
                 document.onkeydown = null;
                 hideAllDropdownsAndShowAllButtons();
-            }   
+            }
         }
         button.classList.add("hidden");
 
-        if(userList){
-            new Awesomplete(assignInputElement, { list: userList , autoFirst: true, minChars:0 });
-        }else{
-            subscribeToUserList(function(list){
-                new Awesomplete(assignInputElement, { list: list , autoFirst: true, minChars: 0 });
+        if (userList) {
+            new Awesomplete(assignInputElement, { list: userList, autoFirst: true, minChars: 0 });
+        } else {
+            dataAccess.subscribeToUserList(function (list) {
+                new Awesomplete(assignInputElement, { list: list, autoFirst: true, minChars: 0 });
             })
         }
         assignInputElement.addEventListener('awesomplete-selectcomplete', function (e) {
             var userName = e.target.value;
-            if(userName == "")return;
+            if (userName == "") return;
             assignUserHandler(userName)
         });
     })
 
     return btn;
 }
-function hideAllDropdownsAndShowAllButtons(){
+function hideAllDropdownsAndShowAllButtons() {
     var buttons = document.getElementsByClassName("assign_user_button");
     var inputs = document.getElementsByClassName("assign_user_dropdown");
-    for(var i = 0 ; i < inputs.length ; i++){
+    for (var i = 0; i < inputs.length; i++) {
         inputs[i].classList.add("hidden");
         buttons[i].classList.remove("hidden");
     }
@@ -566,7 +603,7 @@ function removeAsset() {
     dialog.showMessageBox(null, { type: "question", message: "Delete asset " + assetname + "?", title: "Delete asset", buttons: ["Ok", "Cancel"] }, function (response) {
         if (response == 1) return;
 
-        deleteAsset(assetname);
+        dataAccess.deleteAsset(assetname);
 
     })
 }
@@ -575,7 +612,7 @@ function showHistory() {
     var tooltip = document.getElementById("asset_row_tooltip")
     tooltip.classList.add("hidden");
     if (!rowColumn.getElementsByClassName("asset_history")[0].classList.contains("collapsed")) return closeHistory(rowColumn);
-    getAssetLog(currentlySelectedAssetElement.innerHTML, function (list) {
+    dataAccess.getAssetLog(currentlySelectedAssetElement.innerHTML, function (list) {
         if (list == null || list.length == 0) return;
         var elementList = [];
         var dates = Object.keys(list);
@@ -618,7 +655,7 @@ function closeHistory(rowElement) {
 }
 function assignUserHandler(userName) {
     var assetName = event.target.parentNode.parentNode.parentNode.getElementsByClassName("asset_name")[0].innerHTML;
-    assignAsset(assetName, getAssetInfo(assetName), userName, null)
+    dataAccess.assignAsset(assetName, getAssetInfo(assetName), userName, null)
 }
 function assignToMe(event, assetName) {
     assignHelper(event, assetName, true)
@@ -634,8 +671,8 @@ function assignHelper(event, assetName, assign) {
         assetName = src.parentNode.getElementsByClassName("asset_name")[0].innerHTML;
     }
     var assetInfo = getAssetInfo(assetName);
-    assign ? assignAsset(assetName, assetInfo, currentUserName, null) :
-        unassignAsset(assetName, assetInfo, currentUserName, null);
+    assign ? dataAccess.assignAsset(assetName, assetInfo, currentUserName, null) :
+        dataAccess.unassignAsset(assetName, assetInfo, currentUserName, null);
 }
 
 function getAssetInfo(assetName) {

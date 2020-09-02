@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
-const { app, Menu, BrowserWindow } = require('electron')
+const { app, Menu, shell, BrowserWindow } = require('electron')
 const { ipcMain } = require('electron')
 const { autoUpdater } = require('electron-updater');
+
 
 var updatePending = false;
 autoUpdater.on('update-available', () => {
@@ -47,15 +48,6 @@ const template = [
       { role: 'minimize' },
       { role: 'close' }
     ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click() { require('electron').shell.openExternal('https://electronjs.org') }
-      }
-    ]
   }
 ]
 
@@ -65,12 +57,13 @@ const template = [
 let mainWindow
 var usersWindow;
 var loggedAsAdmin;
-
+global.mainWindow = mainWindow;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1200, height: 800, fullscreen: false, frame: false, webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true
     },
   })
 
@@ -137,7 +130,12 @@ app.on('ready', () => {
   autoUpdater.checkForUpdatesAndNotify();
 
 });
-
+ipcMain.on('app-quit', () => {
+  app.quit();
+});
+ipcMain.on('data-access-initialized', () => {
+  mainWindow.webContents.send("data-access-initialized");
+});
 ipcMain.on('request-admin-info', function () {
   sendUsersWindowAdminInfo();
 });
@@ -156,6 +154,7 @@ ipcMain.on('open-users-window', function (event, adminAccess) {
     width: 1200,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true
     },
   });
 
@@ -185,7 +184,9 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow()
   }
-})
+});
+
+
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

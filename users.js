@@ -1,6 +1,9 @@
-const electron = require("electron");
-const { dialog } = require('electron').remote
 
+const electron = require("electron");
+
+const { dialog } = require('electron').remote;
+const dataAccess = require("./dataaccess")
+dataAccess.initialize();
 const ipc = electron.ipcRenderer;
 var hasAdminAccess = false;
 var userList;
@@ -10,23 +13,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-var currentlyEditingUsername;
+window.addEventListener('online', alertOnlineStatus)
+window.addEventListener('offline', alertOnlineStatus)
+alertOnlineStatus();
+
+function alertOnlineStatus() {
+
+    var statusElements = document.getElementsByClassName("online_status_text");
+    for (var i = 0; i < statusElements.length; i++) {
+        navigator.onLine ? statusElements[i].classList.add("hidden") : statusElements[i].classList.remove("hidden");
+    }
+
+}
+
+var currentlyEditingUser;
 nfcInterfaceCallback = nfcHandler;
 ipc.on("admin-access-sent", function (event, adminAccess) {
     console.log("admin:", adminAccess);
     hasAdminAccess = adminAccess;
     if (hasAdminAccess) document.getElementById("add_user_button").classList.remove("hidden");
-    subscribeToUserList(loadData);
+    dataAccess.subscribeToUserList(loadData);
 });
 
-function nfcHandler(card){
-   
+function nfcHandler(card) {
+
     var cardCode = card.uid;
-    if(cardCode == null) return;
+    if (cardCode == null) return;
     console.log(cardCode)
-    if(!document.activeElement.classList.contains("user_nfc_input"))return;
+    if (!document.activeElement.classList.contains("user_nfc_input")) return;
     document.activeElement.value = cardCode;
-    
+
 
 
 }
@@ -56,12 +72,12 @@ function inputFilterUsers(event) {
         event.target.value = value.replace("/", "");
 }
 
-currentlyEditingUsername = "";
+currentlyEditingUser = "";
 var numRowsOpen = 0;
 
 function loadData(users) {
     if (!hasAdminAccess || users == null) return;
-  
+
     var mainContainer = document.getElementById("users_section");
 
     //empty table
@@ -75,8 +91,8 @@ function loadData(users) {
     for (var i = 0; i < userNames.length; i++) {
         userValues[i].username = userNames[i];
     }
- 
-  //  userList.forEach(user => user.password = null)
+
+    //  userList.forEach(user => user.password = null)
     userList = userValues;
     userValues.forEach(function (row) {
         mainContainer.appendChild(createUserRow(row));
@@ -130,7 +146,7 @@ function createUserRow(userInfo) {
 
     var saveButton = document.createElement("button");
     saveButton.innerHTML = "Save"
-    saveButton.classList.add("button_style", "hidden", "green", "user_save_button", "margin_right");
+    saveButton.classList.add("button_style", "hidden", "green", "user_save_button");
     saveButton.onclick = updateUser;
 
     var cancelButton = document.createElement("button");
@@ -175,9 +191,9 @@ function editUser(event) {
     row.getElementsByClassName("user_password_input")[0].readOnly = false;
     row.getElementsByClassName("user_nfc_input")[0].readOnly = false;
 
-    currentlyEditingUsername = row.getElementsByClassName("user_name_input")[0].value;
- 
-    row.getElementsByClassName("user_admin_input")[0].checked = getUserAdminRights(currentlyEditingUsername);
+    currentlyEditingUser = { name: row.getElementsByClassName("user_name_input")[0].value, code: row.getElementsByClassName("user_nfc_input")[0].value };
+
+    row.getElementsByClassName("user_admin_input")[0].checked = getUserAdminRights(currentlyEditingUser.name);
 
 }
 
@@ -202,32 +218,28 @@ function updateUser(event) {
         dialog.showMessageBox(null, { type: "warning", message: "NFC code required", title: "Unable to save user" })
         return;
     }
+    if (currentlyEditingUser.code != nfcCode)
+        if(validateProperty("nfc_code", nfcCode) === 1) return;
+
+    if (currentlyEditingUser.name != username)
+        if(validateProperty("username", username) === 1) return;
+
+    doSave();
 
 
-    if (currentlyEditingUsername != username) {
-        getUserByName(username, function (value, name) {
-            if (value != null) {
-                dialog.showMessageBox(null, { type: "question", message: "User " + name + " already exists. Overwrite?", title: "Delete asset", buttons: ["Ok", "Cancel"] }, function (response) {
-                    if (response == 1) return;
-                    saveUser(username, password, nfcCode, admin, function () {
-                        row.getElementsByClassName("user_cancel_button")[0].click();
-                        currentlyEditingUsername = "";
-                    });
-                })
-            } else {
-                if (currentlyEditingUsername != "") {
-                    deleteUser(currentlyEditingUsername, getNFCCode(currentlyEditingUsername));
-                }
-                saveUser(username, password, nfcCode, admin, function () {
-                    row.getElementsByClassName("user_cancel_button")[0].click();
-                    currentlyEditingUsername = "";
-                });
-            }
-        });
-    } else {
-        saveUser(username, password, nfcCode, admin, function () {
+    function validateProperty(propName, editingProp) {
+        var existing = userList.find(x => x[propName] === editingProp);
+        console.log(propName, editingProp)
+        if (existing) {
+            return dialog.showMessageBoxSync(null, { type: "question", message: "Another user exists with this " + propName.replace("_", " ") + ". Overwrite?", title: "Overwrite?", buttons: ["Ok", "Cancel"] });
+        }
+    }
+
+    function doSave() {
+        dataAccess.deleteUser(currentlyEditingUser.name, currentlyEditingUser.code);
+        dataAccess.saveUser(username, password, nfcCode, admin, function () {
             row.getElementsByClassName("user_cancel_button")[0].click();
-            currentlyEditingUsername = "";
+            currentlyEditingUser = null;
         });
     }
 }
@@ -268,7 +280,7 @@ function removeUser(event) {
     var username = row.getElementsByClassName("user_name_input")[0].value;
     dialog.showMessageBox(null, { type: "question", message: "Delete user " + username + "?", title: "Delete user", buttons: ["Ok", "Cancel"] }, function (response) {
         if (response == 1) return;
-        deleteUser(username, getNFCCode(username));
+        dataAccess.deleteUser(username, getNFCCode(username));
     })
 }
 

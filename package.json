@@ -1,10 +1,10 @@
 {
   "name": "AssetManagerLite",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A minimal asset management application",
   "main": "main.js",
   "scripts": {
-    "start": "npm install && electron .",
+    "start": "electron .",
     "postinstall": "install-app-deps",
     "build": "electron-builder build --win --publish never",
     "deploy": "electron-builder build  --win --publish always"
@@ -17,14 +17,13 @@
   "author": "Símon Örn Reynisson",
   "license": "CC BY-NC-ND",
   "devDependencies": {
-    "electron": "^4.0.3",
+    "electron": "^10.1.1",
     "electron-builder": "^20.38.5"
   },
   "dependencies": {
     "electron-log": "^3.0.8",
     "electron-updater": "^4.1.2",
-    "firebase": "^5.8.2",
-    "nfc-pcsc": "^0.7.4"
+    "firebase": "^7.19.1"
   },
   "repository": {
     "type": "git",

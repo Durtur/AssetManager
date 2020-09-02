@@ -1,3 +1,13 @@
+
+:root{
+    --main-color:rgb(47, 64, 98);
+    --main-color-darker:rgb(37, 50, 78);
+    --main-color-lighter:rgb(63, 87, 137);
+    --main-color-even-lighter:rgb(148, 169, 214);
+    font-family: 'Roboto', sans-serif;
+    padding:0;
+}
+
 *:focus{
     filter:drop-shadow(0 0 0.25rem lightblue);
     outline: none;
@@ -32,14 +42,7 @@
     font-size:30px;
     margin:0 !important;
 }
-:root{
-    --main-color:rgb(47, 64, 98);
-    --main-color-darker:rgb(37, 50, 78);
-    --main-color-lighter:rgb(63, 87, 137);
-    --main-color-even-lighter:rgb(148, 169, 214);
-    font-family: 'Roboto', sans-serif;
-    padding:0;
-}
+
 html{
     height:100%;
 }
@@ -66,7 +69,7 @@ a {
     background-repeat:no-repeat;
 }
 header{
-   
+    filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.6));
     position:fixed;
     top:0;
     padding:20px;
@@ -99,6 +102,7 @@ header{
     text-align:center;
 }
 .notification_window{
+    overflow:hidden;
     position:absolute;
     height:0;
     width:150px;
@@ -148,7 +152,43 @@ header{
     border:none;
     transition: all 300ms;
 }
-.logout_button:hover{
+
+.login_button_container{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:3;
+    cursor:pointer;
+}
+.reload_button:hover{
+    background-image: url("refresh.png");
+}
+
+.reload_button{
+    background-image:url("refreshb.png");
+    margin-right:1em;
+    background-size:contain;
+    background-color:transparent;
+    height:30px;
+    width:30px;
+    padding:5px;
+    cursor:pointer;
+    border:none;
+    transition: all 300ms;
+}
+
+.quit_button{
+  
+    background-image:url("logoutb.png");
+    background-size:contain;
+    background-color:transparent;
+    height:30px;
+    width:30px;
+    padding:5px;
+    border:none;
+    transition: all 300ms;
+}
+.logout_button:hover, .quit_button:hover{
     background-image:url("logout.png");
 }
 .button_clear{
@@ -204,8 +244,9 @@ header{
 }
 .asset_list_section{
     margin:auto;
-    margin-top:90px;
+   
     padding:10px;
+    filter:drop-shadow(0 0 3px rgba(0,0,0,0.6));
 }
 .assigned_assetlist_container{
 
@@ -310,11 +351,12 @@ header{
 }
 
 .table_header>p, .table_header>h4{
-    width:250px;
-    text-align:center;
-    margin-top:3px;
-    margin-bottom:3px;
-    padding:0;
+    width: 200px;
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding: 0;
+    margin: 1em;
 }
 input{
     width:250px;
@@ -354,7 +396,7 @@ input{
 }
 
 .asset_assigned_date{
-    font-style:italic;
+    font-size: 0.9em;
 }
 .asset_history{
     padding-left:25px;
@@ -366,9 +408,14 @@ input{
     overflow-y:scroll;
 }
 .user_list_row>.container_for_checkbox{
-    margin-left:25px;
+    /* width: 25px;
+    height: 25px; */
 }
+.user_list_row>input{
+    margin:0;
+    padding:0.5em;
 
+}
 .asset_type{
     text-emphasis-style: bold;
 }
@@ -580,7 +627,7 @@ input{
     display: block;
     position: relative;
     padding-left: 35px;
-    margin-bottom: 12px;
+
     cursor: pointer;
     font-size: 22px;
     -webkit-user-select: none;
@@ -603,8 +650,8 @@ input{
     position: absolute;
     top: 0;
     left: 0;
-    height: 25px;
-    width: 25px;
+    height: 100%;
+    width: 100%;
     background-color: var(--main-color);
   }
   
@@ -632,14 +679,12 @@ input{
   
   /* Style the checkmark/indicator */
   .container_for_checkbox .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
+    left: 12px;
+    top: 9px;
+    width: 6px;
+    height: 12px;
     border: solid white;
     border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
 

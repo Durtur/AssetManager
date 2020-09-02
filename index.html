@@ -14,7 +14,12 @@
 
 <body class="background no_scroll">
   <section class="login_section" id="login_wrapper">
-      <p class ="online_status_text login_online_status">No internet</p>
+    <div class = "login_button_container">
+      <button class = "reload_button " onclick = "reload()" title = "Reload"></button>
+      <button class = "quit_button " onclick = "quit()" title = "Quit"></button>
+    </div>
+
+      <p class ="online_status_text login_online_status hidden">No internet</p>
    
     <div class="column center">
         <div class = "logo center"></div>
@@ -118,8 +123,7 @@
     <button class="button_style red " id="delete_assets_button" onclick="removeAsset()">Delete</button>
 
   </div>
-  <script src="nfcInterface.js"></script>
-  <script src="dataaccess.js"></script>
+
   <script src="awesomplete/awesomplete.js"></script>
   <script src="index.js"></script>
 

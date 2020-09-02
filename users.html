@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <p class="online_status_text app_online_status">No internet</p>
+    <p class="online_status_text app_online_status hidden">No internet</p>
     <header>
         <nav>
             <a class="header_button hidden" id="add_user_button" onclick="addUser()">Add user</a>
@@ -20,7 +20,7 @@
 
     </header>
 
-    <section class="asset_list_section" id="users_section">
+    <section class="asset_list_section" style = "margin-top: 80px;" id="users_section">
         <div class="table_header row">
             <h4>Username</h4>
             <p>Password</p>
@@ -28,8 +28,7 @@
             <p id="admin_header_text" class="hidden slim">Admin</p>
         </div>
     </section>
-    <script src="nfcInterface.js"></script>
-    <script src="dataaccess.js"></script>
+
     <script src="users.js"></script>
 </body>
 
