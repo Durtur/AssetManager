@@ -1,6 +1,6 @@
 {
   "name": "AssetManagerLite",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A minimal asset management application",
   "main": "main.js",
   "scripts": {
